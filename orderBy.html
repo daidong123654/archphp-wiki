@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="Stylesheet" type="text/css" href="style.css">
+<title>数据库操作类orderBy</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script language="javascript" type="text/javascript" src="scripts/shCore.js"></script>
+<link rel="stylesheet" href="styles/shCoreDjango.css" type="text/css" media="screen" charset="utf-8">
+<script src="scripts/shBrushPhp.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	SyntaxHighlighter.all();
+</script>
+</head>
+<body>
+
+<h1 id="toc_1">orderBy()</h1>
+<ul>
+<li>
+类似于 limit()我们也可以使用where来实现orderBy
+	<pre class="brush:php">
+	public function orderBy()
+	{
+		$user=M('user');
+		$re_arr=$user-&gt;db-&gt;where('id&gt;0 ORDER BY id')-&gt;find();
+		print_r($re_arr);
+	}
+	</pre>
+
+<li>
+更简洁的使用orderBy函数:
+	<pre class="brush:php">
+	public function orderBy()
+	{
+		$user=M('user');
+		$re_arr=$user-&gt;db-&gt;where('id&gt;0')-&gt;orderBy('id')-&gt;find();
+		print_r($re_arr);
+	}
+	</pre>
+
+<li>
+如果想要反序,使用orderBy('id DESC')
+
+<li>
+orderBy()传入一个合法的字符串,输出一个数据对象 
+
+</ul>
+<p>
+<div align="center"><a href="limit.html">上一页</a> <a href="index.html">首页目录</a>  <a href="getBy.html">下一页</a></div>
+</p>
+
+</body>
+</html>

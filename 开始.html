@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="Stylesheet" type="text/css" href="style.css">
+<title>ArchPHP开始一个项目</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script language="javascript" type="text/javascript" src="scripts/shCore.js"></script>
+<link rel="stylesheet" href="styles/shCoreDjango.css" type="text/css" media="screen" charset="utf-8">
+<script src="scripts/shBrushPhp.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	SyntaxHighlighter.all();
+</script>
+</head>
+<body>
+
+<h1 id="toc_1">开始一个项目</h1>
+<h3 id="toc_1.0.1">1.Hello World</h3>
+<p>
+首先要求环境:PHP 5.3+
+ (以Linux为例,win下可看注释来操作)
+</p>
+<ol>
+<li>
+mkdir Myapp #新建一个项目目录比如Myapp
+
+<li>
+cd Myapp #转到新建的目录中去
+
+<li>
+git clone git@github.com:hit9/Core.git #下载框架到目录下
+
+<li>
+touch index.php #新建入口文件index.php
+
+<li>
+vim index.php #编辑入口文件如下 =
+	<pre class="brush:php">
+	&lt;?php
+	/*
+	 *项目入口文件
+	 */
+	header("Content-type:text/html;charset=utf-8");//设置全局项目编码utf8
+	define('CORE_PATH','./');//定义框架相对入口文件的路径
+	require_once(CORE_PATH.'Core/core.php');//包含框架核心文件
+	Action::run();//执行分发请求
+	</pre>
+
+<li>
+mkdir Action Mod Addon  #在项目目录下建立三个目录Action Mod Addon
+
+<li>
+cd Action #转到Action目录下开始编写代码啦
+
+<li>
+touch index.class.php #建立一个action类
+
+<li>
+vim index.class.php #编写如下代码
+	<pre class="brush:php" >
+	&lt;?php
+	/**
+	*Hello World !
+	**/
+	class IndexAction
+	{
+		public function index()
+		{
+			echo 'Hello World!';
+		}
+	}
+	</pre>
+
+<li>
+访问localhost/Myapp/?c=index&amp;a=index 或者直接访问localhost/Myapp
+
+<li>
+至此我们已经完成了一个Hello World
+
+</ol>
+<h3 id="toc_1.0.2">2.目录结构</h3>
+<ul>
+<li>
+从上面的Hello World可以看出目录结构类似这样:
+
+<li>
+Action/  Mod/  Addon/  Core/ index.php (项目目录下)
+
+<li>
+如果不想把核心框架放在项目目录下,请修改入口文件中的CORE_PATH的定义
+
+</ul>
+<h3 id="toc_1.0.3">3.入口文件</h3>
+<ul>
+<li>
+从前面的Hello World可以看到入口文件的大致样子
+
+</ul>
+<p>
+<div align="center"><a href="index.html">首页目录</a>  <a href="命名规范.html">下一页</a></div>
+</p>
+
+</body>
+</html>

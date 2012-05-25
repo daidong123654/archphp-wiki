@@ -1,0 +1,314 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="Stylesheet" type="text/css" href="style.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script language="javascript" type="text/javascript" src="scripts/shCore.js"></script>
+<link rel="stylesheet" href="styles/shCoreDjango.css" type="text/css" media="screen" charset="utf-8">
+<script src="scripts/shBrushPhp.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	SyntaxHighlighter.all();
+</script>
+</head>
+<body>
+<pre class="brush:php">
+<?php
+/**
+ * Db类,负责数据库连接和基本的CURD,实现了连贯操作和事务处理
+ *配置项:DB_HOST,DB_CHAR_SET,DB_NAME,DB_USER,DB_PASSWD,TABLE_PREFIX
+ *实例化的参数:数据库表的名字(不带前缀)
+ *每次实例化单利连接数据库
+ */
+class Db
+{
+	private static $conn;//数据库连接 
+	private $table;//数据库表名字 
+	private $tablepre;//表前缀
+	private $data;//暂时存放写入的数据的数组
+	private $options;//暂时存放查询条件的数组
+	private $op_array;//允许的特殊操作的数组
+	//默认的主键
+	public $primary_key='id';
+	//构造表名,初始化数组,连接数据库
+	//	参数$classname 是一个Mod模型的类名字,比如 'UserMod'
+	function __construct($classname,$primary_key)
+	{
+		$this->tablepre=TABLE_PREFIX;
+		$this->table=$this->get_table_name($classname);
+		$this->primary_key=$primary_key;
+		$this->data=array();
+		$this->options=array();
+		$this->op_array=array('where','orderBy','limit');//特殊的操作集合,目前支持where,limit,orderBy
+		$this->connect();//连接数据库
+	}
+	//设置类的私有属性
+	function __set($name,$value)
+	{
+		$this->data[$name]=$value;
+	}
+	//重载方法
+	function __call($method,$args)
+	{
+		//如果是查询条件的函数
+		if(in_array($method,$this->op_array))
+		{
+			$this->options[$method]=$args[0];
+			return $this;//  返回此对象
+		}elseif(preg_match("/^getBy/",$method))//如果是getBy函数,就根据字段取出一个结果来 
+		{
+			$char=lcfirst(substr($method,5));//获取字段名,getByChar 字段名在函数名中必须首字母大写
+			$sql="SELECT * FROM ".$this->table." WHERE ".$char."='$args[0]' LIMIT 1";
+			return $this->mysql_fetch_object($sql);
+		}
+	}
+	//清空options数组,所有连贯操作的最后一个操作都要清空options数组
+	private function empty_options()
+	{
+		$this->options=array();
+	}
+	//获取表名
+	private function get_table_name($classname)
+	{
+		if(strstr($classname,'Mod')!=false)//如果是个Mod类
+		{
+			$classname_pure=substr($classname,0,-3);//去掉后面的Mod
+			return $this->tablepre.strtolower($classname_pure);
+		}else{
+			return false;//暂采取此返回值..
+		}
+	}
+	//单例连接数据库,返回连接符号
+	private function connect()
+	{
+		if(!self::$conn)
+		{
+			self::$conn=mysql_connect(DB_HOST,DB_USER,DB_PASSWD);
+			mysql_query('set names '.DB_CHAR_SET);
+			mysql_select_db(DB_NAME);
+		}
+		return self::$conn;
+	}
+	//把数据变成字符串
+	private function implodefields($cond)
+	{
+		$fields = array();
+		foreach($cond as $key => $value) {
+			//安全,转义字符串,防注入
+			$value = $this->check_input($value);
+			$fields[] = "`$key`='$value'";
+		}
+		return implode(', ', $fields);
+	}
+	//检查输入
+	private	function check_input($value)
+	{
+		// 去除斜杠
+		if (get_magic_quotes_gpc())
+		{
+			$value = stripslashes($value);
+		}
+		// 如果不是数字则加引号
+		if (!is_numeric($value))
+		{
+			$value =  mysql_real_escape_string($value);
+		}
+		return $value;
+	}
+	//清洗data数组.一个acion流程中需要多次写入,每写完一次数据都会使用此方法清洗data 
+	public function data_clean()
+	{
+		$this->data=array();
+	}
+	//查询数据库,返回查询句柄
+	private function query($sql='')	
+	{
+		if($sql=='')
+		{
+			die('query():SQL is empty');
+		}else{
+			$re=mysql_query($sql) or die(mysql_error());
+		}
+		return $re;
+	}
+	//获取一个结果集的数目
+	// 参数:sql语句,如果语句为空,取查询条件where的查询条件构造sql语句,如果无查询条件,取出该表的记录个数 
+	public function getNum($sql='')
+	{
+		//无sql语句传入,查看有无查询条件,否则当作查询表的记录数处理
+		if($sql=='')
+		{
+			if(!empty($this->options))//如果前面有连贯操作
+			{
+				$sql="SELECT * FROM `{$this->table}`";
+				$sql=$this->parseoptions($sql);// 解析查询条件构造sql
+				$this->empty_options();//连贯操作的终点需要清空连贯操作的数组options
+			}else{
+				$sql="SELECT * FROM `{$this->table}`";
+			}	
+		}
+		return mysql_num_rows($this->query($sql));
+	}
+	//插入操作,在表上增加一个记录,返回执行结果true or false
+	public function add()
+	{
+		$fields = $this->implodefields($this->data);
+		$sql = "INSERT INTO `{$this->table}` SET $fields";
+		$this->data_clean();//data数组清空 
+		return $this->query($sql);
+	}
+	//查询
+	//如果按照主键查询,则返回一个对象便于快速获取字段值
+	//如果做为一个查询的结果集(前边有连贯条件限制),则返回一个二维数组便于遍历 
+	public function find($id='',$fields='*')
+	{
+		//如果有参数传入,视作查询主键处理
+		//根据主键获取一个对象,默认获取所有,但为了节省资源,建议开发者写明所需的字段
+		if(!empty($id))
+		{
+			$sql="SELECT ".$fields." FROM `{$this->table}` WHERE `{$this->primary_key}`='$id' LIMIT 1";
+			$obj=mysql_fetch_object($this->query($sql));
+			if(empty($obj))//查询结果为空,返回false
+			{
+				return false;
+			}	
+			return $obj;
+		}else{
+			if(!empty($this->options))//如果前面有连贯操作
+			{
+				$sql="SELECT ".$fields." FROM `{$this->table}`";
+				$sql=$this->parseoptions($sql);// 解析查询条件构造sql
+				$this->empty_options();//连贯操作的终点需要清空连贯操作的数组options
+			}else{
+				$sql="SELECT ".$fields." FROM `{$this->table}`";
+			}
+			return $this->exec_sql($sql);		
+		}
+	}
+	//delete函数
+	public function delete($id='')
+	{
+		//如果传入了参数,按照主键删除
+		if(!empty($id))
+		{
+			$sql="DELETE FROM `{$this->table}` WHERE `{$this->primary_key}`='$id'";
+			$this->query($sql);
+			return true;//删除成功
+		}else{
+			$sql="DELETE FROM `{$this->table}`";
+			$sql=$this->parseoptions($sql);// 解析查询条件构造sql
+			$this->empty_options();
+			return	$this->exec_sql($sql);
+		}
+	}
+	//update 部分
+	public function update($id='')
+	{	
+		$fields = $this->implodefields($this->data);
+		//如果传入了参数,按照主键进行更新
+		if(!empty($id))
+		{
+			$sql="UPDATE `{$this->table}` SET ".$fields." WHERE `{$this->primary_key}`='$id'";
+		}else{
+			$sql="UPDATE `{$this->table}` SET ".$fields;
+			$sql=$this->parseoptions($sql);// 解析查询条件构造sql
+			$this->empty_options();
+		}
+		$this->data_clean();//data数组清空 
+		return $this->exec_sql($sql);
+	}
+	//直接执行sql语句
+	public function exec_sql($sql)
+	{
+		$sqltype = strtolower(substr(trim($sql),0,6));// 截取sql语句中的前6个字符串,并转换成小写  
+		$result = $this->query($sql);
+		$calback_arrary = array();// 定义二维数组  
+		if ("select" == $sqltype)// 判断执行的是select语句  
+		{  
+			if (false == $result)  
+			{  
+				return false;     
+			}  
+			else if (0 == mysql_num_rows($result))  
+			{  
+				return false;  
+			}  
+			else  
+			{  
+				while($result_array = mysql_fetch_array($result))  
+				{  
+					array_push($calback_arrary, $result_array);  
+				}  
+				return $calback_arrary;// 成功返回查询结果的二维数组,既然查询到的结果是多个,输出数组便于foreach     
+			}  
+		}  
+		else if ("update" == $sqltype || "insert" == $sqltype || "delete" == $sqltype)  
+		{  
+			if ($result)  
+			{  
+				return true;  
+			}  
+			return false;  
+		}
+	}
+
+	//解析查询条件
+	private function parseoptions($sql='')
+	{
+		if(!empty($this->options) and !empty($sql))				
+		{
+			$arr=$this->options;
+			//首先检查where
+			if(isset($arr['where']))
+			{
+				if(is_string($arr['where']))
+					$sql.=" WHERE ".$arr['where'];
+				elseif(is_array($arr['where']))
+				{
+					$arr_w=$arr['where'];
+					$arr_str=array();
+					foreach ($arr_w as $key=>$var) {
+						$arr_str[]="`".$key."`='".$var."'";
+					}
+					$sql_h=implode(' AND ',$arr_str);
+					$sql.=" WHERE ".$sql_h;
+					unset($sql_h);
+					unset($arr_w);
+					unset($arr_str);
+				}
+			}
+			//检查orderBy
+			if(isset($arr['orderBy']))
+			{
+				$sql.=" ORDER BY ".$arr['orderBy'];
+			}
+			//检查limit
+			if(isset($arr['limit']))
+			{
+				$sql.=" LIMIT ".$arr['limit'];
+			}
+		}
+		//处理返回 
+		return $sql;
+	}
+
+	//事务处理部分,commit & rollback
+	// 开始一个事务
+	public function begin()
+	{
+		$this->query('BEGIN');
+	}
+	//事务完成
+	public function commit()
+	{
+		$this->query('COMMIT');
+	}
+	//事务回滚
+	public function rollback()
+	{
+		$this->query('ROLLBACK');
+	}
+}
+?>
+</pre>	
+</body>
+</html>

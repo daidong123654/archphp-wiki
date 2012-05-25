@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="Stylesheet" type="text/css" href="style.css">
+<title>安装模板引擎</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script language="javascript" type="text/javascript" src="scripts/shCore.js"></script>
+<link rel="stylesheet" href="styles/shCoreDjango.css" type="text/css" media="screen" charset="utf-8">
+<script src="scripts/shBrushPhp.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	SyntaxHighlighter.all();
+</script>
+</head>
+<body>
+
+<h1 id="toc_1">安装模板引擎</h1>
+<h3 id="toc_1.0.1">2.PHP类的模板引擎</h3>
+<ul>
+<li>
+现在PHP类形式的模板引擎数不胜数.
+
+<li>
+ArchPHP本身什么都没有,所以安装模板引擎可以很灵活.
+
+<li>
+以bTemplate为例,有两个安装的方式(bTemplate : <a href="http://www.massassi.com/bTemplate/index.php?page=home">http://www.massassi.com/bTemplate/index.php?page=home</a>)
+
+<li>
+bTemplate是单文件,单个类的,很容易加进去.
+
+</ul>
+<h4 id="toc_1.0.1.1">1.作为Action的属性</h4>
+<ul>
+<li>
+下载好bTemplate,然后修改文件名字为bTemplate.class.php
+
+<li>
+修改bTemplate的类名字为BTemplate (即首字母大写)
+
+<li>
+然后就开始像上面那样去添加了:
+
+<ul>
+<li>
+在Core/Action/action.config.php的数组中加入'bTemplate'并把文件放在Core/Action/bTemplate/下
+
+</ul>
+<li>
+写一个测试的例子:
+
+<li>
+编辑 IndexAction的index方法如下:
+
+</ul>
+<p>
+<pre class="brush:php">
+&lt;?php
+class IndexAction extends Action
+{
+	public function index()
+	{
+		$this-&gt;bTemplate-&gt;set('name','hello');
+		echo $this-&gt;bTemplate-&gt;fetch('sample.html');
+	}
+}
+</pre>
+然后在项目目录下建立模板文件sample.html
+<pre class="brush:php">
+&lt;html&gt;
+&lt;body&gt;
+	&lt;tag:name /&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+访问下localhost/Myapp即可看到输出了hello
+</p>
+<h4 id="toc_1.0.1.2">2.把模板引擎作为Action的父类</h4>
+<ul>
+<li>
+这样的话我们在Action中写代码的时候就可以直接这么写了:
+
+<ul>
+<li>
+$this-&gt;set('name','hello');
+
+<li>
+$this-&gt;fetch('sample.html');
+
+</ul>
+<li>
+不用再写那个bTemplate了.
+
+<li>
+首先把类文件丢到Core中的一个位置去,比如放到Core/Tpl目录下
+
+<li>
+然后编辑Core/Action/action.class.php,在Action类定义处添加extends关键字继承模板类
+
+<li>
+最后在Core/core.php中引入引擎入口类(注意放到action类引入之前)
+
+<li>
+<strong>这个方法适合很多PHP写的模板引擎类</strong>
+
+<li>
+Tpl这个模板很容易装到ArchPHP中去,还有缓存(<a href="tpl.html">是我经常使用的一个模板引擎(来自OSC)</a> (github:<a href="https://github.com/hit9/hit9mvc/blob/master/Tpl/tpl.class.php">https://github.com/hit9/hit9mvc/blob/master/Tpl/tpl.class.php</a>))
+
+</ul>
+<p>
+<div align="center"><a href="安装模板引擎.html">上一页</a> <a href="index.html">首页目录</a>  <a href="安装模板引擎02.html">下一页</a></div>
+</p>
+
+</body>
+</html>

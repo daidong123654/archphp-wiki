@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="Stylesheet" type="text/css" href="style.css">
+<title>数据库操作类事务处理</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script language="javascript" type="text/javascript" src="scripts/shCore.js"></script>
+<link rel="stylesheet" href="styles/shCoreDjango.css" type="text/css" media="screen" charset="utf-8">
+<script src="scripts/shBrushPhp.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	SyntaxHighlighter.all();
+</script>
+</head>
+<body>
+
+<h1 id="toc_1">事务处理</h1>
+<ul>
+<li>
+这个数据库类对事务处理进行了简单的封装
+
+<li>
+开始一个事务:begin();确认:commit();回滚:rollback();
+
+<li>
+Sample code:
+	<pre class="brush:php">
+	public function foo()
+	{
+		$user=M('user');
+		$user-&gt;db-&gt;begin();//开启一个事务
+		$user-&gt;db-&gt;name='小胖';
+		$user-&gt;db-&gt;email='xiaopang@gmail.com';
+		$re1=$user-&gt;db-&gt;add();
+		$user-&gt;db-&gt;name='小惠';
+		$user-&gt;db-&gt;id='25';//假如id=25已经有记录了,构造一个冲突
+		$re2=$user-&gt;db-&gt;add();//构造一个不可能完成的事件做回滚测试 
+		if($re1 &amp;&amp; $re2)
+		{
+			$user-&gt;db-&gt;commit();// 如果均顺利执行,commit
+		}else{
+			$user-&gt;db-&gt;rollback();//否则有一个执行失败则回滚
+		}
+	}
+	</pre>
+
+<li>
+Note: Mysql数据库要是INNODB或BDB才支持事务
+
+</ul>
+<p>
+<div align="center"><a href="delete.html">上一页</a> <a href="index.html">首页目录</a>  <a href="exec_sql.html">下一页</a></div>
+</p>
+
+</body>
+</html>

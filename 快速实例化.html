@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="Stylesheet" type="text/css" href="style.css">
+<title>快速实例化</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script language="javascript" type="text/javascript" src="scripts/shCore.js"></script>
+<link rel="stylesheet" href="styles/shCoreDjango.css" type="text/css" media="screen" charset="utf-8">
+<script src="scripts/shBrushPhp.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	SyntaxHighlighter.all();
+</script>
+</head>
+<body>
+
+<h1 id="toc_1">框架全局函数:快速实例化</h1>
+<h3 id="toc_1.0.1">全局函数的使用</h3>
+<ul>
+<li>
+在框架Core/Comm/function.php文件中定义了三个全局函数A(),M()和Addon()
+
+<li>
+A() 快速实例化一个项目中的Action类并返回对象
+
+<li>
+M() 快速实例化一个项目中的Mod类并返回对象
+
+<li>
+Addon() 快速实例化一个项目中的Addon类并返回对象
+
+<li>
+下面是一个例子:
+
+</ul>
+<p>
+文件:Action/index.class.php
+<pre class="brush:php">
+&lt;?php
+class IndexAction
+{
+	public function index()
+	{
+		$user=M('user');//快速实例化UserMod
+		$user-&gt;foo();//执行类UserMod的函数foo()
+	}
+}
+</pre>
+文件:Mod/user.class.php
+<pre class="brush:php">
+&lt;?php
+/**
+ *UserMod
+ **/
+class UserMod extends Mod
+{
+	public function foo()	
+	{
+		echo 'hello world';
+	}
+}
+</pre>
+</p>
+<ul>
+<li>
+上例中访问localhost/Myapp会看到小写的hello world
+
+<li>
+Core/Comm/function.php中定义的函数可以在程序中的任何位置使用
+
+</ul>
+<p>
+<div align="center"><a href="命名规范.html">上一页</a> <a href="index.html">首页目录</a>  <a href="URL参数解析.html">下一页</a></div>
+</p>
+
+</body>
+</html>

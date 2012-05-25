@@ -1,0 +1,286 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="Stylesheet" type="text/css" href="style.css">
+<title>安装模板引擎</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script language="javascript" type="text/javascript" src="scripts/shCore.js"></script>
+<link rel="stylesheet" href="styles/shCoreDjango.css" type="text/css" media="screen" charset="utf-8">
+<script src="scripts/shBrushPhp.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	SyntaxHighlighter.all();
+</script>
+</head>
+<body>
+<pre class="brush:php">
+
+<?php
+/**
+* 一个小型的PHP模板渲染引擎.
+* {loop $array $key $value}..........{/loop} 循环
+* {loop $array $value}..........{/loop} 循环
+* {if condition}...{elseif condition}..{else}..{/if} if条件语句
+* {$val} 输出变量值
+* {eval echo "ok";} 运行PHP代码
+* {template file} 包含另外一个模版
+* 对象方法:
+* setTplDir($dir)
+* setReal($real)
+* setExtName($ext)
+* setTmpDir($dir)
+* setU(&$dispatcher)
+* assign($name, $value=null)
+* getVal($name)
+* saveHtml($tFile, $html)
+* display($tFile)
+* usage:
+* [code/]
+* require_once('Template.php');
+* $tpl=new Tpl();
+* $tpl->assign('val','test');
+* $tpl->display('test');
+* [/code]
+*
+*/
+class Tpl {
+
+    private $tDir=TPL_DIR; //模版文件目录
+    private $tTmpDir=TPL_C_DIR; //编译好后的文件目录
+    private $tVal; //模版变量
+    private $tFile; //模版文件
+    private $tExtName = '.html'; //模板文件的扩展名
+    private $tContent; //模版内容
+    private $uDispatcher; //URL调度器
+    private $real = TPL_REAL; //实时编译
+
+    public function __construct() {
+        $this->tVal = array();
+    }
+
+    /**
+* 设置模版文件目录
+* @param string $dir
+*/
+    public function setTplDir($dir) {
+        $this->tDir = $dir;
+    }
+
+    /**
+* 是否实时编译
+* @param bool $real
+*/
+    public function setReal($real) {
+        $this->real = (bool) $real;
+    }
+
+    /**
+* 设置模板文件的扩展名
+* @param string $ext 扩展名
+*/
+    public function setExtName($ext) {
+        $this->tExtName = $ext;
+    }
+
+    /**
+* 临时文件目录
+* @param string $dir
+*/
+    public function setTmpDir($dir) {
+        if (!file_exists($dir)) {
+            if (!mkdir($dir, 0, true))
+                die("tmp dir $dir can't to mkdir");
+        }
+        $this->tTmpDir = realpath($dir);
+    }
+
+    /**
+* URL调度器
+* @param Dispatcher $dispatcher
+*/
+    public function setU(&$dispatcher) {
+        if (is_object($dispatcher) && method_exists($dispatcher, 'U')) {
+            $this->uDispatcher = $dispatcher;
+        }
+    }
+
+    /**
+* 注册用户自己的函数
+* 当$function是string时则是方函数，如果是键值对数组时则键是类名，值是类中的静态方法
+* @param mix $function 函数
+*/
+    public function registerFunction($function) {
+        if (is_array($function)) {
+            foreach ($function as $key => $value) {
+                $this->userFunctions['classes'][$key] = $value;
+            }
+        } else {
+            $this->userFunctions['functions'][] = $function;
+        }
+    }
+
+    /**
+* 变量赋值
+* 如果$name是一个键值对的数组，则直接使用对$name数组进行赋值
+* @param mixed $name 变量名
+* @param mixed $value 值
+*/
+    public function assign($name, $value=null) {
+        if (is_array($name)) {
+            foreach ($name as $key => $val) {
+                $this->tVal[$key] = $val;
+            }
+        } else {
+            $this->tVal[$name] = $value;
+        }
+    }
+
+    /**
+* 取得模版的变量
+* @param string $name
+*/
+    public function getVal($name) {
+        if (isset($this->tVal[$name])) {
+            return $this->tVal[$name];
+        }else
+            return false;
+    }
+
+    /**
+* 将运行好后的内容，保存到一个html文件中
+* @param string $tFile
+* @param string $html
+*/
+    public function saveHtml($tFile, $html) {
+        ob_start();
+        $this->display($tFile);
+        $buffer = ob_get_contents();
+        ob_end_clean();
+        file_put_contents($html, $buffer);
+    }
+
+    /**
+* 运行并显示模版内容
+* @param string $tfile
+*/
+    public function display($tFile) {
+        $this->tFile = $this->parseTemplatePath($tFile);
+        if (!file_exists($this->getTmpFile()) || $this->real) {
+            $this->parse();
+        }
+        extract($this->tVal, EXTR_OVERWRITE);
+        include $this->getTmpFile();
+    }
+
+    /**
+* 编译好后的文件
+* @return string $filepath
+*/
+    private function getTmpFile() {
+        $basename = basename($this->tFile);
+        $pos = strrpos($basename, '.');
+        $tmp = 'tpl_' . substr($basename, 0, $pos) . '.php';
+        return $this->tTmpDir . '/' . $tmp;
+    }
+
+    private function parse() {
+        $this->tContent = file_get_contents($this->tFile);
+        $this->parseInclude();
+        $this->parseSection();
+        $this->parseVal();
+        $this->parseEval();
+
+        if (!$this->real) {
+            //如果是在非调试环境下，则替换一些没用的内容
+            $search = array("/\r?\n/", "/\s{2,}/");
+            $repace = array('', '');
+            $this->tContent = preg_replace($search, $repace, $this->tContent);
+        }
+
+        file_put_contents($this->getTmpFile(), $this->tContent);
+    }
+
+    /**
+* 解析模板中的子模板
+*/
+    private function parseInclude() {
+        for ($i = 0; $i < 6; $i++) {
+            $this->tContent = preg_replace("/\{template\s+([a-zA-z0-9\._]+)\}/ies", "\$this->subtemplate('$1')", $this->tContent);
+        }
+    }
+
+    /**
+* 获取只模版
+* @param string $file
+*/
+    private function subtemplate($file) {
+        return file_get_contents($this->parseTemplatePath($file));
+    }
+
+    /**
+* 解析模版路径
+* @param string $file
+* @return string $filepath
+*/
+    private function parseTemplatePath($tFile) {
+        $tFile.=$this->tExtName;
+        $tFile = $this->tDir ? $this->tDir . '/' . $tFile : $tFile;
+        if (!file_exists($tFile)) {
+            die("No template file $tFile");
+        } else {
+            $tFile = realpath($tFile);
+        }
+        return $tFile;
+    }
+
+    /**
+* 解析变量
+*/
+    private function parseVal() {
+        $this->tContent = preg_replace("/\{(\\$\S+?)\}/is", "<?php echo \\1 ;?>", $this->tContent);
+    }
+
+    /**
+* 解析段落
+*/
+    private function parseSection() {
+        //逻辑
+        $this->tContent = preg_replace("/\{elseif\s+(.+?)\}/ies", "\$this->stripvtags('<?php } elseif(\\1) { ?>','')", $this->tContent);
+        $this->tContent = preg_replace("/\{else\}/is", "<?php } else { ?>", $this->tContent);
+        $this->tContent = preg_replace("/\{U\((.+?)\)\}/ies", "\$this->parseUrl('$1')", $this->tContent);
+        //循环
+        for ($i = 0; $i < 6; $i++) {
+            $this->tContent = preg_replace("/\{loop\s+(\S+)\s+(\S+)\}(.+?)\{\/loop\}/ies", "\$this->stripvtags('<?php if(is_array(\\1)) { foreach(\\1 as \\2) { ?>','\\3<?php } } ?>')", $this->tContent);
+            $this->tContent = preg_replace("/\{loop\s+(\S+)\s+(\S+)\s+(\S+)\}(.+?)\{\/loop\}/ies", "\$this->stripvtags('<?php if(is_array(\\1)) { foreach(\\1 as \\2 => \\3) { ?>','\\4<?php } } ?>')", $this->tContent);
+            $this->tContent = preg_replace("/\{if\s+(.+?)\}(.+?)\{\/if\}/ies", "\$this->stripvtags('<?php if(\\1) { ?>','\\2<?php } ?>')", $this->tContent);
+        }
+    }
+
+    private function stripvtags($expr, $statement='') {
+        $expr = str_replace("\\\"", "\"", preg_replace("/\<\?\=(\\\$.+?)\?\>/s", "\\1", $expr));
+        $statement = str_replace("\\\"", "\"", $statement);
+        return $expr . $statement;
+    }
+
+    /**
+* 解析PHP语句
+*/
+    private function parseEval() {
+        $this->tContent = preg_replace("/\{eval\s+(.+?)\}/is", "<?php $1 ?>", $this->tContent);
+    }
+
+    /**
+* 解析URL
+*/
+    private function parseUrl($url) {
+        if (is_object($this->uDispatcher)) {
+            return $this->uDispatcher->U($url);
+        } else {
+            return $url;
+        }
+    }
+
+
+}
+
+</pre>
+</body>

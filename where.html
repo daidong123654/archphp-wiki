@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="Stylesheet" type="text/css" href="style.css">
+<title>数据库操作类where函数 </title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script language="javascript" type="text/javascript" src="scripts/shCore.js"></script>
+<link rel="stylesheet" href="styles/shCoreDjango.css" type="text/css" media="screen" charset="utf-8">
+<script src="scripts/shBrushPhp.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	SyntaxHighlighter.all();
+</script>
+</head>
+<body>
+
+<h1 id="toc_1">where()</h1>
+<ul>
+<li>
+where()方法接受字符串和数组参数,返回一个数据对象
+
+<li>
+可行的sample code:
+  <pre class="brush:php">
+  	public function where()
+	{
+		//字符串参数和数组参数例子
+		$user=M('user');
+		$re_arr1=$user-&gt;db-&gt;where('id=1 AND name="小明"')-&gt;find();
+		$condition['id']=1;
+		$condition['name']='小明';
+		$re_arr2=$user-&gt;db-&gt;where($condition)-&gt;find();
+		$re_arr3=$user-&gt;db-&gt;where('id=1')-&gt;where('name="小明"')-&gt;find();
+		print_r($re_arr1);//三个数组打印结果一致
+		print_r($re_arr2);
+		print_r($re_arr3);
+	}
+  </pre>
+
+<li>
+通过code可以看出,where支持字符串条件,数组条件,支持一串长龙式的where连贯
+
+</ul>
+<p>
+<div align="center"><a href="find.html">上一页</a> <a href="index.html">首页目录</a>  <a href="limit.html">下一页</a></div>
+</p>
+
+</body>
+</html>

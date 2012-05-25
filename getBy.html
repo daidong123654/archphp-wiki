@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="Stylesheet" type="text/css" href="style.css">
+<title>数据库操作类getBy</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script language="javascript" type="text/javascript" src="scripts/shCore.js"></script>
+<link rel="stylesheet" href="styles/shCoreDjango.css" type="text/css" media="screen" charset="utf-8">
+<script src="scripts/shBrushPhp.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	SyntaxHighlighter.all();
+</script>
+</head>
+<body>
+
+<h1 id="toc_1">getBy*()</h1>
+<ul>
+<li>
+函数根据某个字段名称动态得到对应的一条数据记录,比如获取登录的用户名是否存在
+
+<li>
+下例中我们根据小明的名字获取到了他的邮箱
+	<pre class="brush:php">
+	public function getBy()
+	{
+		$user=M('user');
+		echo $user-&gt;db-&gt;getByName('小明')-&gt;email;
+	}
+	</pre>
+
+<li>
+getBy*()的*处必须是数据库该表的一个字段名(首字母需要大写)
+
+<li>
+此函数传入数字或字符串,返回一个查询结果的对象(只取一个记录)
+
+</ul>
+<p>
+<div align="center"><a href="orderBy.html">上一页</a> <a href="index.html">首页目录</a>  <a href="getNum.html">下一页</a></div>
+</p>
+
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="Stylesheet" type="text/css" href="style.css">
+<title>安装模板引擎</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script language="javascript" type="text/javascript" src="scripts/shCore.js"></script>
+<link rel="stylesheet" href="styles/shCoreDjango.css" type="text/css" media="screen" charset="utf-8">
+<script src="scripts/shBrushPhp.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	SyntaxHighlighter.all();
+</script>
+</head>
+<body>
+
+<h1 id="toc_1">安装模板引擎</h1>
+<ul>
+<li>
+你可以安装自己喜欢的模板引擎并在ArchPHP中使用.(支持以相对路径引入的PHP模板引擎)
+
+<li>
+<em>由于Smarty必须绝对路径引入,所以ArchPHP抛弃之(而且它很重)</em>
+
+</ul>
+<h3 id="toc_1.0.1">1.Blitz模板引擎</h3>
+<ul>
+<li>
+Blitz是一款使用C语言写的PHP扩展,据说是最快的模板引擎.
+
+</ul>
+<h4 id="toc_1.0.1.1">关于Blitz的安装:(当然老手自觉飞过)</h4>
+<ul>
+<li>
+安装环境选用的是Linux(ArchLinux):
+
+<li>
+首先下载Blitz安装包,解压,进入解压后的目录
+
+<li>
+phpize (在ArchLinux上是/usr/bin/phpize)
+
+<li>
+./configure
+
+<li>
+sudo make install
+
+<li>
+编辑php.ini 加入下面一行:
+
+<ul>
+<li>
+extension=blitz.so 
+
+</ul>
+<li>
+查看你的phpinfo会看到Blitz已经加载了
+
+</ul>
+<h4 id="toc_1.0.1.2">安装到ArchPHP中</h4>
+<ul>
+<li>
+1. 编辑Core/Action/action.class.php,在__get()函数中找到require_once语句,前边添加:
+
+<ul>
+<li>
+if($name!=='blitz')
+
+<li>
+编辑后的__get()是这样的:
+		<pre class="brush:php">
+		function __get($name)
+		{
+			if(empty($this-&gt;pro_arr))
+				$this-&gt;pro_arr=require_once(CORE_PATH.'Core/Action/action.config.php');
+			if(in_array($name,$this-&gt;pro_arr,true))
+			{
+				if(!array_key_exists($name,self::$pro))
+				{
+					self::$pro[$name]=NULL;
+				}
+				if(self::$pro[$name]===NULL)
+				{
+					if($name!=='blitz')//添加处
+						require_once(CORE_PATH.'Core/Action/'.$name.'/'.$name.'.class.php');
+					$classname=ucwords($name);
+					self::$pro[$name]=new $classname;
+					unset($classname);
+				}
+				return self::$pro[$name];
+			}
+		}
+		</pre>
+
+</ul>
+<li>
+2. 编辑Core/Action/action.config.php,把'blitz'加入数组,像这样:
+		<pre class="brush:php">
+		&lt;?php
+		/*
+		 *配置action的功能
+		 */
+		return array(
+			'blitz'
+		);
+		</pre>
+
+</ul>
+<h4 id="toc_1.0.1.3">在ArchPHP项目中使用Blitz</h4>
+<ul>
+<li>
+我们还是拿IndexAction来做测试:
+
+<li>
+这时,项目的Action 类如果想使用blitz就要继承框架Action类
+
+</ul>
+<p>
+<pre class="brush:php">
+&lt;?php
+class IndexAction extends Action
+{
+	public function testblitz()
+	{
+		$this-&gt;blitz-&gt;load('Where is the {{ $what }}, Lebowski?');
+		$this-&gt;blitz-&gt;display(array('what'=&gt;'money'));
+	}
+}
+</pre>
+</p>
+<ul>
+<li>
+写完code后访问localhost/Myapp/index.php?a=testblitz
+
+<li>
+会看到 :Where is the money, Lebowski? 
+
+<li>
+what已经被换成了money.
+
+<li>
+Blitz还有很多功能,这里只说怎么用到ArchPHP中来
+
+</ul>
+<p>
+<div align="center"><a href="快速实例化.html">上一页</a> <a href="index.html">首页目录</a>  <a href="安装模板引擎01.html">下一页</a></div>
+</p>
+
+</body>
+</html>

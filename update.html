@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="Stylesheet" type="text/css" href="style.css">
+<title>数据库操作类update</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script language="javascript" type="text/javascript" src="scripts/shCore.js"></script>
+<link rel="stylesheet" href="styles/shCoreDjango.css" type="text/css" media="screen" charset="utf-8">
+<script src="scripts/shBrushPhp.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	SyntaxHighlighter.all();
+</script>
+</head>
+<body>
+
+<h1 id="toc_1">update()</h1>
+<ul>
+<li>
+update($id='');函数参数是主键的一个值或者使用前面指定的查询条件,返回bool
+
+<li>
+Sample code
+
+<li>
+1.按照主键更新
+	<pre class="brush:php">
+	public function update()
+	{
+		$user=M('user');
+		$user-&gt;db-&gt;name='小红';
+		$user-&gt;db-&gt;email='xiaohong@gmail.com';
+		$user-&gt;db-&gt;update(1);
+	}
+	</pre>
+
+<li>
+2.按照条件更新
+	<pre class="brush:php">
+	public function update()
+	{
+		$user=M('user');
+		$user-&gt;db-&gt;name='小红';
+		$user-&gt;db-&gt;email='xiaohong@gmail.com';
+		$user-&gt;db-&gt;where('name="小明"')-&gt;update();
+	}
+	</pre>
+	或者使用数组条件:
+	<pre class="brush:php">
+	public function update()
+	{
+		$user=M('user');
+		$user-&gt;db-&gt;name='小红';
+		$user-&gt;db-&gt;email='xiaohong@gmail.com';
+		$condition['name']='小明';
+		$condition['email']='xiaoming@gmail.com';
+		$user-&gt;db-&gt;where($condition)-&gt;update();
+	}
+	</pre>
+
+</ul>
+<p>
+<div align="center"><a href="getNum.html">上一页</a> <a href="index.html">首页目录</a>  <a href="delete.html">下一页</a></div>
+</p>
+
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="Stylesheet" type="text/css" href="style.css">
+<title>数据库操作类find()查询数据</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script language="javascript" type="text/javascript" src="scripts/shCore.js"></script>
+<link rel="stylesheet" href="styles/shCoreDjango.css" type="text/css" media="screen" charset="utf-8">
+<script src="scripts/shBrushPhp.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	SyntaxHighlighter.all();
+</script>
+</head>
+<body>
+
+<h1 id="toc_1">find()</h1>
+<ul>
+<li>
+查询数据库find()
+
+<ul>
+<li>
+<strong>按照主键查找(返回查询结果对象)</strong>:
+		<pre class="brush:php">
+		&lt;?php
+		public function find()
+		{
+			$user=M('user');
+			echo $user-&gt;db-&gt;find(1)-&gt;name;
+		}
+		</pre>
+
+<li>
+db类默认的主键是id.需要修改主键的话,比如t_user表的主键为user_id而不是id,就需要Mod/在user.class.php中添加一个公有字段primary_key
+		<pre class="brush:php">
+		&lt;?php
+		/**
+		 *UserMod
+		 **/
+		class UserMod extends Mod
+		{
+			public $primary_key='user_id';
+		}
+		</pre>
+
+<ul>
+<li>
+如果你明确要查询的字段,使用find('primary_key','name')查询更好
+
+</ul>
+<li>
+<strong>按照查询条件查找(返回查询结果的二维数组)</strong>:
+
+<li>
+db类提供了查询条件where()函数.where函数见<a href="where.html">where</a>
+		<pre class="brush:php">
+		public	function find()
+		{
+			$user=M('user');
+			$re_arr = $user-&gt;db-&gt;where('id=1')-&gt;find();//查询id=1的数据
+			print_r($re_arr);
+			$re_arr=$user-&gt;db-&gt;where('name="小明"')-&gt;find();//查询name="小明"的数据
+			print_r($re_arr);
+			$condition['name']='小明';
+			$condition['id']='1';
+			$re_arr=$user-&gt;db-&gt;where($condition)-&gt;find();//按照数组条件查询数据
+			print_r($re_arr);
+		}
+		</pre>
+
+</ul>
+</ul>
+<p>
+<div align="center"><a href="add.html">上一页</a> <a href="index.html">首页目录</a>  <a href="where.html">下一页</a></div>
+</p>
+
+</body>
+</html>

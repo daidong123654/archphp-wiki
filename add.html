@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="Stylesheet" type="text/css" href="style.css">
+<title>数据库操作类add()添加数据</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script language="javascript" type="text/javascript" src="scripts/shCore.js"></script>
+<link rel="stylesheet" href="styles/shCoreDjango.css" type="text/css" media="screen" charset="utf-8">
+<script src="scripts/shBrushPhp.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	SyntaxHighlighter.all();
+</script>
+</head>
+<body>
+
+<h1 id="toc_1">add()</h1>
+<ol>
+<li>
+假如我们已经建立好数据库testcore,并且已经建立了表t_user (字段id,name,email).每个表名(不含前缀)对应一个同名的Mod
+
+<li>
+添加数据到数据库add()
+
+<ul>
+<li>
+首先建立一个Mod类:Myapp/Mod/user.class.php:
+		class UserMod extends Mod
+
+<li>
+然后在IndexAction中写测试: 
+		<pre class="brush:php">
+		&lt;?php
+		class IndexAction extends Action
+		{
+			public function add()
+			{
+				$user=M('user');
+				$user-&gt;db-&gt;name='小明';
+				$user-&gt;db-&gt;email='xiaoming@gmail.com';
+				$user-&gt;db-&gt;add();
+			}
+		}
+		</pre>
+
+<ul>
+<li>
+访问localhost/Myapp/index.php?a=add会添加这个数据到数据库
+
+</ul>
+</ul>
+</ol>
+<p>
+<div align="center"><a href="安装数据库操作类.html">上一页</a> <a href="index.html">首页目录</a>  <a href="find.html">下一页</a></div>
+</p>
+
+</body>
+</html>

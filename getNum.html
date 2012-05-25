@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="Stylesheet" type="text/css" href="style.css">
+<title>数据库操作类getNum</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script language="javascript" type="text/javascript" src="scripts/shCore.js"></script>
+<link rel="stylesheet" href="styles/shCoreDjango.css" type="text/css" media="screen" charset="utf-8">
+<script src="scripts/shBrushPhp.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	SyntaxHighlighter.all();
+</script>
+</head>
+<body>
+
+<h1 id="toc_1">getNum()</h1>
+<ul>
+<li>
+getNum($sql='');函数参数是sql语句或者使用前面的查询条件,返回查询到的记录个数
+
+<li>
+Sample code:
+
+<li>
+以下的三种使用方式获取的结果是一样的
+	<pre class="brush:php">
+	public function getNum()
+	{
+		$user=M('user');
+		echo $user-&gt;db-&gt;getNum('SELECT id FROM t_user WHERE name="小明"');
+		echo $user-&gt;db-&gt;where('name="小明"')-&gt;getNum();
+		$condition['name']='小明';
+		echo $user-&gt;db-&gt;where($condition)-&gt;getNum();
+	}
+	</pre>
+
+</ul>
+<p>
+<div align="center"><a href="getBy.html">上一页</a> <a href="index.html">首页目录</a>  <a href="update.html">下一页</a></div>
+</p>
+
+</body>
+</html>

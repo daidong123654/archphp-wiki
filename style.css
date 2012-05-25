@@ -1,0 +1,16 @@
+body{
+	margin-left:5%;
+	margin-right:5%;
+}
+h1{
+	text-align:center;
+}
+em{
+	color:#999;
+}
+ul{
+	list-style:none;
+}
+li{
+	padding:5px 0
+}

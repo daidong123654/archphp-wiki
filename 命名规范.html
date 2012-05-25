@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="Stylesheet" type="text/css" href="style.css">
+<title>ArchPHP命名规范</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script language="javascript" type="text/javascript" src="scripts/shCore.js"></script>
+<link rel="stylesheet" href="styles/shCoreDjango.css" type="text/css" media="screen" charset="utf-8">
+<script src="scripts/shBrushPhp.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	SyntaxHighlighter.all();
+</script>
+</head>
+<body>
+
+<h1 id="toc_1">命名规范</h1>
+<ol>
+<li>
+新建一个Action类
+
+<ul>
+<li>
+<strong>Action类负责项目的逻辑控制</strong>
+
+<li>
+ cd Action #转到项目的Action目录下
+
+<li>
+ touch test.class.php #比如我们建立一个名字是test的Action
+
+<li>
+vim test.class.php #编辑这个文件如下
+	<pre class="brush:php">
+	&lt;?php
+	class TestAction
+	{		
+	}
+	</pre>
+
+<li>
+这样就建立了一个Action类
+
+<li>
+或者可以这么定义(如果需要的话)
+	<pre class="brush:php">
+	&lt;?php
+	class TestAction extends Action
+	{
+	}
+	</pre>
+	<strong>所以Action类的命名规范是:类文件名字全小写类似 test.class.php;类名字双峰式类似: TestAction</strong>
+
+</ul>
+<li>
+新建一个Mod类
+
+<ul>
+<li>
+Mod类负责项目的模型建设(怎么说呢,如果你熟悉MVC模式就不用去了解了).<strong>Mod即Model之意</strong>
+
+<li>
+完全类似于Action的命名规则:<strong>类文件名字全小写类似 test.class.php;类名字双峰式类似: TsetAction</strong>
+
+<li>
+另外,Mod的类一般需要继承框架的类Mod,所以需要像下面这样定义一个Mod类
+	<pre class="brush:php">
+	&lt;?php
+	class TestMod extends Mod
+	{
+	}
+	</pre>
+
+</ul>
+<li>
+新建一个Addon类
+
+<ul>
+<li>
+完全与前两者一样.在项目中Addon类是出于需求而使用的第三方类库(比如PHPmailer,PHP短信接口,PHP缩略图类等).
+
+<li>
+框架本身不会去提供这些类
+
+<li>
+<strong>类文件名字全小写类似: test.class.php;类名字双峰式类似: TestAddon</strong>
+
+<li>
+另外:Addon类定义时不需要继承框架的类
+
+</ul>
+</ol>
+<p>
+<div align="center"><a href="开始.html">上一页</a> <a href="index.html">首页目录</a>  <a href="快速实例化.html">下一页</a></div>
+</p>
+
+</body>
+</html>

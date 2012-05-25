@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="Stylesheet" type="text/css" href="style.css">
+<title>安装模板引擎</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script language="javascript" type="text/javascript" src="scripts/shCore.js"></script>
+<link rel="stylesheet" href="styles/shCoreDjango.css" type="text/css" media="screen" charset="utf-8">
+<script src="scripts/shBrushPhp.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	SyntaxHighlighter.all();
+</script>
+</head>
+<body>
+
+<h1 id="toc_1">安装模板引擎</h1>
+<h3 id="toc_1.0.1">3.简单地安装Tpl</h3>
+<ul>
+<li>
+说实话这个模板引擎的名字我还真不知道,在OSC上看到的,真是个好东西
+
+<li>
+下载:<a href="https://github.com/hit9/hit9mvc/blob/master/Tpl/tpl.class.php">https://github.com/hit9/hit9mvc/blob/master/Tpl/tpl.class.php</a>
+
+</ul>
+<h4 id="toc_1.0.1.1">安装到ArchPHP中</h4>
+<ul>
+<li>
+1.<strong>安装为Action的属性:</strong> 把文件tpl.class.php放到目录Core/Action/tpl/下,并在Core/Action/action.config.php的数组中加入'tpl'即可 .然后在Core/Config/config.php中加入配置
+
+<ul>
+<li>
+如何使用:
+
+<li>
+详细的模板语法在tpl.class.php文件中已有.
+
+<li>
+这里只写一个测试安装成功的例子
+
+<li>
+首先在Core/Config/config.php中加入的配置:
+		<pre class="brush:php">
+		/*
+		 *Tpl配置
+		 */
+		define('TPL_DIR','Tpl');//模板存放目录,相对于入口文件
+		define('TPL_C_DIR','Tpl_c');//模板缓存目录,相对于入口文件
+		define('TPL_REAL',true);//实时编译,开发完成后关掉
+		</pre>
+
+<li>
+然后写一个测试:
+		<pre class="brush:php" >
+		&lt;?php
+		class IndexAction extends Action
+		{
+			public function index()
+			{
+				$this-&gt;tpl-&gt;assign('var','hello');
+				$this-&gt;tpl-&gt;display('sample');
+			}
+		}
+		</pre>
+		相应的Tpl/文件夹下的sample.html模板是:
+		<pre class="brush:php">
+		&lt;html&gt;
+		&lt;head&gt;
+			&lt;meta http-equiv="content-type" content="text/html; charset=utf-8"&gt;
+			&lt;title&gt;Sample&lt;/title&gt;
+		&lt;/head&gt;
+		&lt;body&gt;
+			{$var}
+		&lt;/body&gt;
+		&lt;/html&gt;
+		</pre>
+
+</ul>
+<li>
+2.<strong>安装为Action的父类</strong>
+
+<li>
+把模板放到Core下随便一个目录 比如Core/Tpl 然后在Core/core.php中引入这个类:
+
+<ul>
+<li>
+require_once(CORE_PATH.'Tpl/tpl.class.php');//注意此句需要在Core/Action/action.class.php引入之前
+
+</ul>
+<li>
+然后修改Core/Action/action.class.php:(继承Tpl类)
+
+<ul>
+<li>
+class Action extends Tpl
+
+</ul>
+<li>
+配置Tpl类,同方法一:(Core/Config/config.php中加入以下配置)
+		<pre class="brush:php">
+		/*
+		 *Tpl配置
+		 */
+		define('TPL_DIR','Tpl');//模板存放目录,相对于入口文件
+		define('TPL_C_DIR','Tpl_c');//模板缓存目录,相对于入口文件
+		define('TPL_REAL',true);//实时编译,开发完成后关掉
+		</pre>
+
+<li>
+然后按照开始测试!
+		<pre class="brush:php" >
+		&lt;?php
+		class IndexAction extends Action
+		{
+			public function index()
+			{
+				$this-&gt;assign('var','hello');
+				$this-&gt;display('sample');
+			}
+		}
+		</pre>
+		相应的模板文件sample.html(Tpl目录下)
+		<pre class="brush:php">
+		&lt;html&gt;
+		&lt;head&gt;
+			&lt;meta http-equiv="content-type" content="text/html; charset=utf-8"&gt;
+			&lt;title&gt;Sample&lt;/title&gt;
+		&lt;/head&gt;
+		&lt;body&gt;
+			{$var}
+		&lt;/body&gt;
+		&lt;/html&gt;
+		</pre>
+
+</ul>
+<p>
+<div align="center"><a href="安装模板引擎01.html">上一页</a> <a href="index.html">首页目录</a>  <a href="安装数据库操作类.html">下一页</a></div>
+</p>
+
+</body>
+</html>
