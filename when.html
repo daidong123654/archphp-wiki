@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="Stylesheet" type="text/css" href="style.css">
+<title>输入格式检查when</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script language="javascript" type="text/javascript" src="scripts/shCore.js"></script>
+<link rel="stylesheet" href="styles/shCoreDjango.css" type="text/css" media="screen" charset="utf-8">
+<script src="scripts/shBrushPhp.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	SyntaxHighlighter.all();
+</script>
+</head>
+<body>
+
+<h1 id="toc_1">when()</h1>
+<ul>
+<li>
+when($varname,$condition)函数用来构造格式检查条件,接受字符串参数和数组参数,返回构造好查询条件的input对象
+
+<li>
+Sample Code:
+
+<ul>
+<li>
+仍然使用<a href="post.html">post()</a>例子中的那个模板sample.html.相应的接收数据的foo函数这样写:
+	<pre class="brush:php">
+	public function foo()
+	{
+		echo $this-&gt;input-&gt;when('name','username')-&gt;post();
+		echo $this-&gt;input-&gt;when('email','email')-&gt;post();
+	}
+	</pre>
+
+<li>
+上面的代码表明了:name必须是username格式的(3-16位数字或字母组成);email必须是email格式的
+
+<li>
+when 内置了判定email ,url,ip ,pic,date,color,username,tel,phone的正则,比如我们判定一个属性名字是user_ip的输入是否是ip:when('user_ip','ip')
+
+<li>
+另外,一个属性如果需要多个判定条件同时约束,比如说要求username必须至少6位可以这样:when('name','username and strlen($name)&gt;=6')
+	<pre class="brush:php">
+	public function foo()
+	{
+		echo $this-&gt;input-&gt;when('name','username and strlen($name)&gt;=6')-&gt;post();
+		echo $this-&gt;input-&gt;when('email','email')-&gt;post();
+	}
+	</pre>
+
+<li>
+这时我们再输入小于6位的字符串就不好用了~会抛出错误name
+
+<li>
+也就是说when的条件参数是使用' and '连接起来的内置条件参数或者执行后返回一个布尔值的语句比如说下面的一个例子完全合乎语法:when('name','username and '.true),当然when('name','username and true')也是可以的
+	-when() 还支持数组作为查询条件,数组的键是输入数据的属性名字,值是这个属性的格式限制条件(内置字符串或者可以执行返回布尔值的字符串)
+	<pre class="brush:php">
+	public function foo()
+	{
+		$condition['name']='username and strlen($name)&gt;=6';
+		$condition['email']='email';
+		$arr=$this-&gt;input-&gt;when($condition)-&gt;post();
+		print_r($arr);
+	}
+	</pre>
+
+<li>
+上面的例子说明了when使用数组作为查询参数的情形,也说明了当post()(或者get())获取的数据不止一个的时候会返回一个二维数组(键是属性名,值是获取的数据值)
+
+<li>
+上面的code还等同于:
+	<pre class="brush:php">
+	public function foo()
+	{
+		$arr=$this-&gt;input-&gt;when('name','username and strlen($name)&gt;=6')-&gt;when('email','email')-&gt;post();
+		print_r($arr);
+	}
+	</pre>
+
+</ul>
+</ul>
+<p>
+<div align="center"><a href="post.html">上一页</a> <a href="index.html">首页目录</a>  <a href="create.html">下一页</a></div>
+</p>
+
+</body>
+</html>

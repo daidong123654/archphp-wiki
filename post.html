@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="Stylesheet" type="text/css" href="style.css">
+<title>输入格式检查类post</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script language="javascript" type="text/javascript" src="scripts/shCore.js"></script>
+<link rel="stylesheet" href="styles/shCoreDjango.css" type="text/css" media="screen" charset="utf-8">
+<script src="scripts/shBrushPhp.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	SyntaxHighlighter.all();
+</script>
+</head>
+<body>
+
+<h1 id="toc_1">post()</h1>
+<ul>
+<li>
+雷同于get().post($varname='')接受的参数是输入数据的属性名字或不接受参数.当接收一个数据的时候返回这个数据,当接收多个数据的时候返回一个一维数组
+
+<li>
+post()用于检查输入的数据是否是POST数据
+
+<li>
+Sample Code:
+	新建一个表单sample.html:
+	<pre class="brush:php">
+	&lt;html&gt;
+	&lt;body&gt;
+		&lt;form action="?a=foo" method="post" accept-charset="utf-8"&gt;
+			&lt;p&gt;
+				name:&lt;input type="text" name="name" value=""&gt;
+			&lt;/p&gt;	
+			&lt;p&gt;
+				email:&lt;input type="text" name="email" value=""&gt;
+			&lt;/p&gt;
+			&lt;p&gt;&lt;input type="submit" value="Continue &amp;rarr;"&gt;&lt;/p&gt;
+		&lt;/form&gt;
+	&lt;/body&gt;
+	&lt;/html&gt;
+	</pre>
+	然后在IndexAction中加个函数来显示这个表单,比如我使用的模板引擎是tpl
+	<pre class="brush:php">
+	public function form()
+	{
+		$this-&gt;tpl-&gt;display('sample');
+	}
+	</pre>
+	然后在IndexAction中加入foo函数接收数据:
+	<pre class="brush:php">
+	public function foo()
+	{
+		echo $this-&gt;input-&gt;post('name');
+		echo $this-&gt;input-&gt;post('email');
+	}	
+	</pre>
+	接下来访问localhost/Myapp/?a=form填写表单测试下~.
+
+</ul>
+	
+<p>
+<div align="center"><a href="get.html">上一页</a> <a href="index.html">首页目录</a>  <a href="when.html">下一页</a></div>
+</p>
+
+</body>
+</html>

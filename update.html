@@ -16,11 +16,16 @@
 <h1 id="toc_1">update()</h1>
 <ul>
 <li>
-update($id='');函数参数是主键的一个值或者使用前面指定的查询条件,返回bool
+update($id='',$arr=array());函数参数是主键的一个值或者使用前面指定的查询条件,返回bool
 
 <li>
 Sample code
 
+</ul>
+<p>
+<strong>使用对象方式:</strong>
+</p>
+<ul>
 <li>
 1.按照主键更新
 	<pre class="brush:php">
@@ -44,7 +49,7 @@ Sample code
 		$user-&gt;db-&gt;where('name="小明"')-&gt;update();
 	}
 	</pre>
-	或者使用数组条件:
+	或者使用数组更新条件:
 	<pre class="brush:php">
 	public function update()
 	{
@@ -54,6 +59,35 @@ Sample code
 		$condition['name']='小明';
 		$condition['email']='xiaoming@gmail.com';
 		$user-&gt;db-&gt;where($condition)-&gt;update();
+	}
+	</pre>
+
+</ul>
+<p>
+<strong>使用数组方式</strong>:
+</p>
+<ul>
+<li>
+按照主键更新:
+	<pre class="brush:php">
+	public function foo()
+	{
+		$user=M('user');
+		$data['name']='xiaoming';
+		$data['email']='xiaoming@qq.com';
+		$user-&gt;db-&gt;update(1,$data);
+	}
+	</pre>
+
+<li>
+按照条件更新:
+	<pre class="brush:php">
+	public function foo()
+	{
+		$user=M('user');
+		$data['name']='xiaoming';
+		$data['email']='xiaoming@qq.com';
+		$user-&gt;db-&gt;where('name="小胖"')-&gt;update($data);
 	}
 	</pre>
 

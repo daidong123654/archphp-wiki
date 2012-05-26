@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="Stylesheet" type="text/css" href="style.css">
+<title>输入格式检查create</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script language="javascript" type="text/javascript" src="scripts/shCore.js"></script>
+<link rel="stylesheet" href="styles/shCoreDjango.css" type="text/css" media="screen" charset="utf-8">
+<script src="scripts/shBrushPhp.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	SyntaxHighlighter.all();
+</script>
+</head>
+<body>
+
+<h1 id="toc_1">create()</h1>
+<ul>
+<li>
+create($method='');抓取表单并生成以表单属性名为键以输入数据为值的数组.允许使用when进行格式检查
+
+<li>
+接收的参数$method指明表单是GET还是POST请求,不填写则智能判断
+
+<li>
+create会抓取到一次请求中所有的GET或者POST数据
+
+<li>
+Sample Code:
+
+<ul>
+<li>
+仍然使用刚才那个表单.
+	<pre class="brush:php">
+	public function foo()
+	{
+		$arr=$this-&gt;input-&gt;create('post');
+		print_r($arr);
+	}
+	</pre>
+	你会看到打印出了一个一维数组
+
+<li>
+如果我们需要进行格式检查: 
+	<pre class="brush:php">
+	public function foo()
+	{
+		$condition['name']='username';
+		$condition['email']='email';
+		$arr=$this-&gt;input-&gt;when($condition)-&gt;create('post');
+		print_r($arr);
+	}
+	</pre>
+	当然也可以这样~
+	<pre class="brush:php">
+	public function foo()
+	{
+		$arr=$this-&gt;input-&gt;when('name','username')-&gt;when('email','email')-&gt;create('post');
+		print_r($arr);
+	}
+	</pre>
+
+<li>
+那create('post')跟post()有什么不同?create会先进行格式检查再返回所有的POST数据.post()对写明的属性进行格式检查然后返回它们的数组.现在编辑那个sample.html模板,添加一个input框tel:
+	<pre class="brush:php">
+	&lt;html&gt;
+	&lt;body&gt;
+		&lt;form action="?a=foo" method="post" accept-charset="utf-8"&gt;
+			&lt;p&gt;
+				name:&lt;input type="text" name="name" value=""&gt;
+			&lt;/p&gt;	
+			&lt;p&gt;
+				email:&lt;input type="text" name="email" value=""&gt;
+			&lt;/p&gt;
+			&lt;p&gt;
+				Tel:&lt;input type="text" name="tel" value=""&gt;
+			&lt;/p&gt;
+			&lt;p&gt;&lt;input type="submit" value="Continue &amp;rarr;"&gt;&lt;/p&gt;
+		&lt;/form&gt;
+	&lt;/body&gt;
+	&lt;/html&gt;
+	</pre>
+
+<li>
+然后我们修改函数foo()来测试create('post')和post()的区别:
+	<pre class="brush:php">
+	public function foo()
+	{
+		$arr1=$this-&gt;input-&gt;when('name','username')-&gt;when('email','email')-&gt;create('post');
+		$arr2=$this-&gt;input-&gt;when('name','username')-&gt;when('email','email')-&gt;post();
+		print_r($arr1);
+		print_r($arr2);
+	}
+	</pre>
+
+<li>
+<strong>会发现我们提交合格的数据后,$arr1会有一个tel的键的元素,而$arr2没有.也就是create()会抓取表单.post()只处理前面声明了的数据.</strong>
+
+</ul>
+<li>
+附:如果现有的ArchPHP框架已经安装了<a href="安装数据库操作类.html">数据库操作类</a>.那可以方便地实现格式检查并入库了:
+
+<ul>
+<li>
+注意先把sample模板中的添加的tel的input删掉.create会收集每个POST或者GET数据	
+	<pre class="brush:php">
+	public function foo()
+	{
+		$user=M('user');
+		$condition['name']='username';
+		$condition['email']='email';
+		$arr=$this-&gt;input-&gt;when($condition)-&gt;create();
+		foreach ($arr as $key=&gt;$var) {
+			$user-&gt;db-&gt;$key=$var;
+		}
+		$user-&gt;db-&gt;add();
+	}
+	</pre>
+
+</ul>
+</ul>
+<p>
+<div align="center"><a href="when.html">上一页</a> <a href="index.html">首页目录</a>  <a href="错误抛出.html">下一页</a></div>
+</p>
+
+</body>
+</html>

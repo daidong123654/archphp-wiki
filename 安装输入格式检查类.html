@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="Stylesheet" type="text/css" href="style.css">
+<title>安装输入格式检查类</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script language="javascript" type="text/javascript" src="scripts/shCore.js"></script>
+<link rel="stylesheet" href="styles/shCoreDjango.css" type="text/css" media="screen" charset="utf-8">
+<script src="scripts/shBrushPhp.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	SyntaxHighlighter.all();
+</script>
+</head>
+<body>
+
+<h1 id="toc_1">安装输入格式检查类</h1>
+<ol>
+<li>
+简介:格式检查类负责输入数据的格式检查.作为Action的一个属性安装
+
+<li>
+下载:cd Core/Action/
+
+<ul>
+<li>
+git clone git@github.com:hit9/input.git
+
+</ul>
+<li>
+编辑Core/Action/action.config.php,在数组中添加'input'
+
+<li>
+配置项:INPUT_ERROR_ECHO(设置为true的时候,遇到格式不符合数据echo错误名字并结束PHP脚本)
+	在Core/Config/config.php中添加:
+	<pre class="brush:php">
+	/*
+	 *input配置
+	 */
+	define('INPUT_ERROR_ECHO',true);//回显格式检查错误并die
+	</pre>
+
+</ol>
+<p>
+<div align="center"><a href="exec_sql.html">上一页</a> <a href="index.html">首页目录</a>  <a href="get.html">下一页</a></div>
+</p>
+
+</body>
+</html>

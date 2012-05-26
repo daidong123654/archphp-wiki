@@ -19,7 +19,7 @@
 假如我们已经建立好数据库testcore,并且已经建立了表t_user (字段id,name,email).每个表名(不含前缀)对应一个同名的Mod
 
 <li>
-添加数据到数据库add()
+添加数据到数据库add():<strong>对象方式</strong>
 
 <ul>
 <li>
@@ -48,6 +48,18 @@
 
 </ul>
 </ul>
+<li>
+添加数据到数据库:<strong>数组方式</strong>
+		<pre class="brush:php">
+		public function add()
+		{
+			$user=M('user');
+			$data['name']='hh';
+			$data['email']='hh@qq.com';
+			$user-&gt;db-&gt;add($data);
+		}
+		</pre>	
+
 </ol>
 <p>
 <div align="center"><a href="安装数据库操作类.html">上一页</a> <a href="index.html">首页目录</a>  <a href="find.html">下一页</a></div>
