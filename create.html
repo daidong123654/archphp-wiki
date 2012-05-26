@@ -109,10 +109,18 @@ Sample Code:
 		$condition['name']='username';
 		$condition['email']='email';
 		$arr=$this-&gt;input-&gt;when($condition)-&gt;create();
-		foreach ($arr as $key=&gt;$var) {
-			$user-&gt;db-&gt;$key=$var;
-		}
-		$user-&gt;db-&gt;add();
+		$user-&gt;db-&gt;add($arr);
+	}
+	</pre>
+	而修改数据可以这么写:
+	<pre class="brush:php">
+	public function foo()
+	{
+		$user=M('user');
+		$condition['name']='username';
+		$condition['email']='email';
+		$arr=$this-&gt;input-&gt;when($condition)-&gt;create();
+		$user-&gt;db-&gt;update(34,$arr);
 	}
 	</pre>
 
